@@ -42,7 +42,7 @@ public class Login extends AppCompatActivity {
                 else{
                     //search username in Database
                     //if username not exist : toast
-                    //else if name and pwd do not match : toast
+                    //else if taskName and pwd do not match : toast
                     //else
                     {
                         Intent intent = new Intent(Login.this, MainActivity.class);
