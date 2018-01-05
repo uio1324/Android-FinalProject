@@ -17,23 +17,24 @@ import java.util.List;
  */
 
 public class CourseDB extends SQLiteOpenHelper {
-    private static String DB_NAME;
+//    private static String DB_NAME;
     private static final int DB_VERSION = 1;
+    private static final String TABLE_NAME1 = "Courses";
+    private static final String TABLE_NAME2 = "StuCourses";
 
     public CourseDB(Context context) {
-        super(context, DB_NAME, null, DB_VERSION);
-        DB_NAME = context.getResources().getString(R.string.DB_name);
+        super(context, context.getResources().getString(R.string.DB_name), null, DB_VERSION);
     }
 
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_TABLE1 = "create table " + "Courses"
+        String CREATE_TABLE1 = "create table " + TABLE_NAME1
                 + " (courseId integer primary key autoincrement, "
                 + "courseName text , "
                 + "weekday integer , "
                 + "startTime text , "
                 + "endTime text , "
                 + "teacherName text);";
-        String CREATE_TABLE2 = "create table " + "StuCourses"
+        String CREATE_TABLE2 = "create table " + TABLE_NAME2
                 + " (Id integer primary key autoincrement, "
                 + "sname text , "
                 + "cid integer)";
@@ -45,21 +46,30 @@ public class CourseDB extends SQLiteOpenHelper {
 
     public int existCourse(CourseModel course){
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = db.rawQuery("select * from Courses " +
-                "where courseName = ? and weekday = ? and startTime = ? and endTime = ? and teacherName = ?",
-                new String[]{course.getCourseName(), Integer.toString(course.getWeekDay()), course.getStartTime(), course.getEndTime(), course.getTeacherName()});
-        if(cursor.getCount() == 0) return -1;
-        else return cursor.getInt(cursor.getColumnIndex("courseId"));
+        Cursor cursor = db.query(TABLE_NAME1, new String[]{"courseId"},
+                "courseName = ? and weekday = ? and startTime = ? and endTime = ? and teacherName = ?",
+                new String[]{course.getCourseName(), Integer.toString(course.getWeekDay()), course.getStartTime(), course.getEndTime(), course.getTeacherName()},
+                null, null,null);
+        if(cursor.getCount() == 0) {
+            cursor.close();
+            db.close();
+            return -1;
+        }
+        else {
+            cursor.close();
+            db.close();
+            return cursor.getInt(cursor.getColumnIndex("courseId"));
+        }
     }
 
 
     //根据学生的名字，返回该学生参与的所有课程
     public List<CourseModel> queryCourseBySname(String sname){
         SQLiteDatabase db = getWritableDatabase();
-        List<CourseModel> queryRes = new ArrayList();
-        Cursor cursor = db.rawQuery("select courseId, courseName, weekday, startTime, endTime, tearherName " +
+        List<CourseModel> queryRes = new ArrayList<>();
+        Cursor cursor = db.rawQuery("select courseId, courseName, weekday, startTime, endTime, teacherName " +
                 "from Courses, StuCourses " +
-                "where Courses.courseId = StuCourses.cid and StuCourses.sname = ?", new String[]{sname});
+                "where Courses.courseId = StuCourses.cid and StuCourses.sname = " + sname, null);
         while (cursor.moveToNext()){
             CourseModel tmp = new CourseModel();
             tmp.setCourseId(cursor.getInt(cursor.getColumnIndex("courseID")));
@@ -70,14 +80,16 @@ public class CourseDB extends SQLiteOpenHelper {
             tmp.setTeacherName(cursor.getString(cursor.getColumnIndex("teacherName")));
             queryRes.add(tmp);
         }
+        cursor.close();
+        db.close();
         return queryRes;
     }
 
     //返回所有课程
     public List<CourseModel> getAllCourses(){
         SQLiteDatabase db = getWritableDatabase();
-        List<CourseModel> queryRes = new ArrayList();
-        Cursor cursor = db.rawQuery("select * from Courses", null);
+        ArrayList<CourseModel> queryRes = new ArrayList<>();
+        Cursor cursor = db.query(TABLE_NAME1, null, null, null, null, null, null);
         while (cursor.moveToNext()){
             CourseModel tmp = new CourseModel();
             tmp.setCourseId(cursor.getInt(cursor.getColumnIndex("courseID")));
@@ -88,20 +100,29 @@ public class CourseDB extends SQLiteOpenHelper {
             tmp.setTeacherName(cursor.getString(cursor.getColumnIndex("teacherName")));
             queryRes.add(tmp);
         }
+        cursor.close();
+        db.close();
         return queryRes;
     }
 
     //传入参数为课程id和学生名称，用于学生从已存在课程列表选择课程加入
     public void addExistedCourse(int courseId, String sname){
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = db.rawQuery("select * from StuCourses " +
-                "where cid = ? and sname = ?", new String[]{Integer.toString(courseId), sname});
-        if(cursor.getCount() > 0) return;
+        String whereClause = "cid = ? and sname = ?";
+        Cursor cursor = db.query(TABLE_NAME2, null,
+                whereClause , new String[]{Integer.toString(courseId), sname},
+                null, null, null);
+        if(cursor.getCount() > 0) {
+            cursor.close();
+            db.close();
+            return;
+        }
         ContentValues values = new ContentValues();
         //values.put("Id", null);
         values.put("sname", sname);
         values.put("cid", courseId);
         db.insert("StuCourses", null, values);
+        cursor.close();
         db.close();
     }
 
@@ -120,11 +141,13 @@ public class CourseDB extends SQLiteOpenHelper {
             values.put("endTime", course.getEndTime());
             values.put("teacherName", course.getTeacherName());
             db.insert("Courses", null, values);
-            Cursor cursor = db.rawQuery("select * from Courses " +
-                            "where courseName = ? and weekday = ? and startTime = ? and endTime = ? and teacherName = ?",
-                    new String[]{course.getCourseName(), Integer.toString(course.getWeekDay()), course.getStartTime(), course.getEndTime(), course.getTeacherName()});
+            Cursor cursor = db.query(TABLE_NAME1, null,
+                            "courseName = ? and weekday = ? and startTime = ? and endTime = ? and teacherName = ?",
+                    new String[]{course.getCourseName(), Integer.toString(course.getWeekDay()), course.getStartTime(), course.getEndTime(), course.getTeacherName()},
+                    null, null, null);
             int id = cursor.getInt(cursor.getColumnIndex("courseId"));
             addExistedCourse(id, sname);
+            cursor.close();
         }
         db.close();
     }
@@ -132,8 +155,9 @@ public class CourseDB extends SQLiteOpenHelper {
     //用于修改课程内容，传入执行修改的学生名和课程的model类
     public void updateCourse(String sname, CourseModel course){
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = db.rawQuery("select * from StuCourses " +
-                "where cid = ?", new String[]{Integer.toString(course.getCourseId())});
+        Cursor cursor = db.query(TABLE_NAME2, null,
+                "where cid = ?", new String[]{Integer.toString(course.getCourseId())},
+                null, null, null);
         if(cursor.getCount() == 1){
             String whereClause = "courseId = ?";
             String[] whereArgs = {Integer.toString(course.getCourseId())};
@@ -143,22 +167,24 @@ public class CourseDB extends SQLiteOpenHelper {
         String[] whereArgs = {Integer.toString(course.getCourseId())};
         db.delete("StuCourses", whereClause, whereArgs);
         addNewCourse(sname, course);
+        cursor.close();
         db.close();
     }
 
     //用于删除课程，传入执行删除的学生名和要删除的课程id
     public void deleteCourse(String sname, int cid){
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = db.rawQuery("select * from StuCourses " +
-                "where cid = ?", new String[]{Integer.toString(cid)});
+        Cursor cursor = db.query(TABLE_NAME2, null, "where cid = ?",
+                new String[]{Integer.toString(cid)}, null, null, null);
         if(cursor.getCount() == 1){
             String whereClause = "courseId = ?";
             String[] whereArgs = {Integer.toString(cid)};
-            db.delete("Courses", whereClause, whereArgs);
+            db.delete(TABLE_NAME1, whereClause, whereArgs);
         }
         String whereClause = "cid = ?";
         String[] whereArgs = {Integer.toString(cid)};
-        db.delete("StuCourses", whereClause, whereArgs);
+        db.delete(TABLE_NAME2, whereClause, whereArgs);
+        cursor.close();
         db.close();
     }
 
