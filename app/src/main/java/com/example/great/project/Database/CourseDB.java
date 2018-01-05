@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.great.project.Models.CourseModel;
+import com.example.great.project.Model.CourseModel;
 import com.example.great.project.R;
 
 import java.util.ArrayList;
