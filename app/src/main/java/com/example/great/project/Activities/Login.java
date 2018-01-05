@@ -1,4 +1,4 @@
-package com.example.great.project;
+package com.example.great.project.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +13,8 @@ import com.example.great.project.Model.Student;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.great.project.R;
 
 public class Login extends AppCompatActivity {
 

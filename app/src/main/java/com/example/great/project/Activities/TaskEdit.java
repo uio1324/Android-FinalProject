@@ -1,7 +1,9 @@
-package com.example.great.project;
+package com.example.great.project.Activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.great.project.R;
 
 public class TaskEdit extends AppCompatActivity {
 

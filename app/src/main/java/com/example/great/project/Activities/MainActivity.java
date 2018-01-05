@@ -1,4 +1,4 @@
-package com.example.great.project;
+package com.example.great.project.Activities;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -12,12 +12,16 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+<<<<<<< HEAD:app/src/main/java/com/example/great/project/MainActivity.java
 import com.example.great.project.Database.StudentDB;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+=======
+import com.example.great.project.R;
+>>>>>>> 01c99604d55d7c35a441177498b58b34e95249b8:app/src/main/java/com/example/great/project/Activities/MainActivity.java
 
 public class MainActivity extends AppCompatActivity {
 
