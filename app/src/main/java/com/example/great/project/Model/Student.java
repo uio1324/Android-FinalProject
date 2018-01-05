@@ -9,12 +9,9 @@ public class Student {
     private String nickName;
     private String password;
 
-    public Student(String sName, String nickName, String password) {
+    public void setSName(String sName) {
         this.sName = sName;
-        this.nickName = nickName;
-        this.password = password;
     }
-
     public void setNickName(String nickName) {
         this.nickName = nickName;
     }
@@ -30,28 +27,4 @@ public class Student {
         return password;
     }
 
-
-    private Integer maxTask = 5;
-    private String studyTime = null;
-    private String restTime = null;
-
-    public void setMaxTask(Integer maxTask) {
-        this.maxTask = maxTask;
-    }
-    public void setStudyTime(String startTime) {
-        this.studyTime = startTime;
-    }
-    public void setRestTime(String restTime) {
-        this.restTime = restTime;
-    }
-
-    public Integer getMaxTask() {
-        return maxTask;
-    }
-    public String getStudyTime() {
-        return studyTime;
-    }
-    public String getRestTime() {
-        return restTime;
-    }
 }
