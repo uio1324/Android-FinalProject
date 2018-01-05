@@ -10,9 +10,7 @@ import com.example.great.project.Models.CourseModel;
 import com.example.great.project.R;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by great on 2018/1/5.
