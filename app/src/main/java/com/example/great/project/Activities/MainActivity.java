@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(new Intent(MainActivity.this, Login.class), 1);
         }
         else{
-            //search in DB to initial classes and ddl;
+            //search in DB to initial classes and taskDDL;
             //Toast 欢迎您username
         }
     }
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("username", username);
             editor.commit();
-            //search in DB to initial classes and ddl;
+            //search in DB to initial classes and taskDDL;
         }
     }
 
