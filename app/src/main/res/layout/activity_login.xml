@@ -16,40 +16,33 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.35"
         android:id="@+id/login_input">
 
         <EditText
+            android:id="@+id/login_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:hint="用户名"
-            android:inputType="textPassword"
-            android:id="@+id/login_username"/>
-
+            android:inputType="textPassword" />
 
         <EditText
+            android:id="@+id/login_pwd"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textSize="20sp"
             android:hint="密码"
+            android:inputType="textPassword" />
+
+        <EditText
+            android:id="@+id/login_confirmpwd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="确认密码"
+            android:visibility="gone"
             android:inputType="textPassword"
-            android:id="@+id/login_pwd"/>
-
+            android:textSize="20sp" />
     </LinearLayout>
-
-    <EditText
-        android:id="@+id/login_confirmpwd"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="确认密码"
-        android:inputType="textPassword"
-        android:textSize="20sp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/login_input" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -64,6 +57,7 @@
             android:id="@+id/login_login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="36dp"
             android:text="登录"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -73,7 +67,6 @@
             android:layout_height="wrap_content"
             android:text="注册"
             app:layout_constraintEnd_toEndOf="parent" />
-
     </LinearLayout>
 
     <Button
@@ -84,8 +77,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="确认注册"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_confirmpwd" />
+        app:layout_constraintTop_toBottomOf="@+id/login_input" />
 
 </android.support.constraint.ConstraintLayout>
