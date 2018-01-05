@@ -7,4 +7,4 @@ import java.util.*
  * fuck comment
  */
 
-data class Task(val id: Int, val taskName: String, val taskBrief: String, val taskDDL: Date, val creatorID: Int)
+data class Task(val id: Int, val taskName: String, val taskBrief: String, val taskDDL: Date, val creatorName: String)
