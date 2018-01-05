@@ -1,4 +1,4 @@
-package com.example.great.project;
+package com.example.great.project.Activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,10 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.example.great.project.R;
 
 public class MainActivity extends AppCompatActivity {
 
