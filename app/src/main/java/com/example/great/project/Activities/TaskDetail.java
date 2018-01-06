@@ -2,6 +2,11 @@ package com.example.great.project.Activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.widget.Button;
+import android.widget.HorizontalScrollView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.great.project.R;
 
@@ -15,9 +20,28 @@ public class TaskDetail extends AppCompatActivity {
     //同时可以邀请用户加入。邀请时在任务_user表中新建条目，是否加入置否。
     //可以发布新的info，taskid在task_info表中更新内容
 
+    RelativeLayout headerLayout;
+    TextView taskNameTextView;
+    TextView briefTextView;
+    TextView creatorTextView;
+    HorizontalScrollView participantListView;
+    RecyclerView taskListView;
+    TaskEdit pusherEditor;
+    Button sendBtn;
+
+    int taskId = 0;
+    int courseId = 0;
+    int stuId = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_detail);
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            taskId = extras.getInt("taskId");
+            courseId = extras.getInt("courseId");
+            stuId = extras.getInt("stuId");
+        }
     }
 }
