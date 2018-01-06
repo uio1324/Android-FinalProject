@@ -23,8 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:hint="用户名"
-            android:inputType="textPassword" />
+            android:hint="用户名" />
 
         <EditText
             android:id="@+id/login_pwd"

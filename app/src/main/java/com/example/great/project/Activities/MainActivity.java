@@ -2,6 +2,7 @@ package com.example.great.project.Activities;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,24 +10,54 @@ import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.great.project.Database.CourseDB;
 import com.example.great.project.Database.StudentDB;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.example.great.project.Model.CourseModel;
+import com.example.great.project.Model.Student;
 import com.example.great.project.R;
+
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator;
 
 public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPref;
     private BottomNavigationView navigation;
+    private CourseDB cdb = new CourseDB(this);
     private StudentDB sdb = new StudentDB(this);
-    List<Map<String, Object>> stulist = new ArrayList<>();
 
+    private List<Map<String, Object>> stulist = new ArrayList<>();
+    private List<Map<String, Object>> courseItem = new ArrayList<>();
+    private RecyclerView courseRecy;
+    private FloatingActionButton addButton;
+    private CommonAdapter courseListAdp;
+    private CommonAdapter courseExistedAdp;
+    private Student student;
+    private TextView courseHint;
+    private RecyclerView courseExisted;
+    private AlertDialog.Builder addCourse;
+    int addBtnFlag;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -88,8 +119,53 @@ public class MainActivity extends AppCompatActivity {
     //其余各类的具体内容写在各个类里
 
     private void initial(){
+        addBtnFlag = 0;
+        addCourse = new AlertDialog.Builder(MainActivity.this);
+
         navigation = findViewById(R.id.navigation);
         disableShiftMode(navigation);
+        courseRecy = findViewById(R.id.course_recy);
+        addButton = findViewById(R.id.addCourse);
+        courseHint = findViewById(R.id.course_hint);
+        courseExisted = findViewById(R.id.course_existed);
+        courseExisted.setVisibility(View.INVISIBLE);
+        this.courseListAdp = new CommonAdapter<Map<String, Object>>(this, R.layout.lesson_recy_layout, this.courseItem) {
+            @Override
+            public void convert(ViewHolder viewHolder, Map<String, Object> s) {
+                TextView name = viewHolder.getView(R.id.lesson_name);
+                name.setText(s.get("name").toString());
+                TextView time = viewHolder.getView(R.id.lesson_time);
+                time.setText(s.get("time").toString());
+                TextView room = viewHolder.getView(R.id.lesson_room);
+                room.setText(s.get("room").toString());
+                TextView teacher = viewHolder.getView(R.id.lesson_teacher);
+                teacher.setText(s.get("teacher").toString());
+            }
+        };
+        this.courseExistedAdp = new CommonAdapter<Map<String, Object>>(this, R.layout.lesson_recy_layout, this.courseItem) {
+            @Override
+            public void convert(ViewHolder viewHolder, Map<String, Object> s) {
+                TextView name = viewHolder.getView(R.id.lesson_name);
+                name.setText(s.get("name").toString());
+                TextView time = viewHolder.getView(R.id.lesson_time);
+                time.setText(s.get("time").toString());
+                TextView room = viewHolder.getView(R.id.lesson_room);
+                room.setText(s.get("room").toString());
+                TextView teacher = viewHolder.getView(R.id.lesson_teacher);
+                teacher.setText(s.get("teacher").toString());
+            }
+        };
+
+        this.courseRecy.setLayoutManager(new LinearLayoutManager(this));
+        this.courseExisted.setLayoutManager(new LinearLayoutManager(this));
+        ScaleInAnimationAdapter animationAdapter1 = new ScaleInAnimationAdapter(courseListAdp);
+        ScaleInAnimationAdapter animationAdapter2 = new ScaleInAnimationAdapter(courseExistedAdp);
+        animationAdapter1.setDuration(1000);
+        animationAdapter2.setDuration(1000);
+        courseRecy.setAdapter(animationAdapter1);
+        courseExisted.setAdapter(animationAdapter2);
+        courseRecy.setItemAnimator(new OvershootInLeftAnimator());
+        courseExisted.setItemAnimator(new OvershootInLeftAnimator());
 
         sharedPref = MainActivity.this.getSharedPreferences("username", Context.MODE_PRIVATE);
         String username = sharedPref.getString("username","");
@@ -97,13 +173,151 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(new Intent(MainActivity.this, Login.class), 1);
         }
         else{
-            //search in DB to initial classes and taskDDL;
-            //Toast 欢迎您username
+            student = sdb.queryStu(sharedPref.getString("username", "")).get(0);
+            Toast.makeText(MainActivity.this, "欢迎" + student.getSName() + "同学", Toast.LENGTH_SHORT).show();
+            List<CourseModel> courselist = cdb.queryCourseBySname(student.getSName());
+
+            for(int i = 0; i < courselist.size(); i++){
+                Map<String, Object> tmp = new LinkedHashMap<>();
+                tmp.put("name", courselist.get(i).getCourseName());
+                tmp.put("time", courselist.get(i).getTime());
+                tmp.put("room", courselist.get(i).getRoom());
+                tmp.put("teacher", courselist.get(i).getTeacherName());
+                tmp.put("object", courselist.get(i));
+                courseItem.add(tmp);
+            }
+            courseListAdp.notifyDataSetChanged();
         }
     }
 
     private void setListener(){
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        /*this.goodsAdp.setOnItemClickListener(new CommonAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                Intent intent = new Intent(MainActivity.this, DatailPage.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("goods", (Serializable)MainActivity.this.data.get(position));
+                intent.putExtras(bundle);
+                MainActivity.this.startActivityForResult(intent, 1);
+            }
+
+            @Override
+            public void onLongClick(int position) {
+                MainActivity.this.goodsAdp.removeItem(position);
+                data.remove(position);
+                Toast.makeText(MainActivity.this, "移除第" + position+ "个商品", Toast.LENGTH_LONG).show();
+            }
+        });*/
+        courseListAdp.setOnItemClickListener(new CommonAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+
+            }
+
+            @Override
+            public void onLongClick(int position) {
+
+            }
+        });
+        courseExistedAdp.setOnItemClickListener(new CommonAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                CourseModel course = (CourseModel) courseItem.get(position).get("object");
+                addBtnFlag = 0;
+                cdb.addExistedCourse(course.getCourseId(), student.getSName());
+                courseHint.setText("添加课程");
+                courseRecy.setVisibility(View.VISIBLE);
+                courseExisted.setVisibility(View.INVISIBLE);
+                List<CourseModel> courselist = cdb.queryCourseBySname(student.getSName());
+                courseItem.clear();
+                for(int i = 0; i < courselist.size(); i++){
+                    Map<String, Object> tmp = new LinkedHashMap<>();
+                    tmp.put("name", courselist.get(i).getCourseName());
+                    tmp.put("time", courselist.get(i).getTime());
+                    tmp.put("room", courselist.get(i).getRoom());
+                    tmp.put("teacher", courselist.get(i).getTeacherName());
+                    tmp.put("object", courselist.get(i));
+                    courseItem.add(tmp);
+                }
+                courseListAdp.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onLongClick(int position) {
+
+            }
+        });
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(addBtnFlag == 0){
+                    courseHint.setText("自定课程");
+                    courseRecy.setVisibility(View.INVISIBLE);
+                    courseExisted.setVisibility(View.VISIBLE);
+                    courseItem.clear();
+                    List<CourseModel> courselist = cdb.getAllCourses();
+                    for(int i = 0; i < courselist.size(); i++){
+                        Map<String, Object> tmp = new LinkedHashMap<>();
+                        tmp.put("name", courselist.get(i).getCourseName());
+                        tmp.put("time", courselist.get(i).getTime());
+                        tmp.put("room", courselist.get(i).getRoom());
+                        tmp.put("teacher", courselist.get(i).getTeacherName());
+                        tmp.put("object", courselist.get(i));
+                        courseItem.add(tmp);
+                    }
+                    courseListAdp.notifyDataSetChanged();
+                    addBtnFlag = 1;
+                }
+                else{
+                    addCourse.setTitle("添加自定义课程");
+                    LayoutInflater factor = LayoutInflater.from(MainActivity.this);
+                    View view_in = factor.inflate(R.layout.course_edit_dialog_layout, null);
+                    addCourse.setView(view_in);
+                    final EditText editCourseName = view_in.findViewById(R.id.course_edit_name);
+                    final EditText editCourseRoom = view_in.findViewById(R.id.course_edit_room);
+                    final EditText editCourseStartHour = view_in.findViewById(R.id.course_edit_start_hour);
+                    final EditText editCourseStratMinute = view_in.findViewById(R.id.course_edit_start_minute);
+                    final EditText editCourseEndHour = view_in.findViewById(R.id.course_edit_end_hour);
+                    final EditText editCourseEndMinute = view_in.findViewById(R.id.course_edit_end_minute);
+                    final EditText editCourseTeacher = view_in.findViewById(R.id.course_edit_teacher);
+                    final Spinner editCourseweekday = view_in.findViewById(R.id.course_edit_weekday);
+                    addCourse.setPositiveButton("添加课程", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            CourseModel course = new CourseModel();
+                            course.setRoom(editCourseRoom.getText().toString());
+                            course.setCourseName(editCourseName.getText().toString());
+                            course.setStartTime(editCourseStartHour.getText().toString() + ":" + editCourseStratMinute.getText().toString());
+                            course.setEndTime(editCourseEndHour.getText().toString() + ":" + editCourseEndMinute.getText().toString());
+                            course.setWeekDay(editCourseweekday.getSelectedItem().toString());
+                            course.setTeacherName(editCourseTeacher.getText().toString());
+                            cdb.addNewCourse(student.getSName(), course);
+                            addBtnFlag = 0;
+                            courseHint.setText("添加课程");
+                            courseRecy.setVisibility(View.VISIBLE);
+                            courseExisted.setVisibility(View.INVISIBLE);
+                            List<CourseModel> courselist = cdb.queryCourseBySname(student.getSName());
+                            courseItem.clear();
+                            for(int i = 0; i < courselist.size(); i++){
+                                Map<String, Object> tmp = new LinkedHashMap<>();
+                                tmp.put("name", courselist.get(i).getCourseName());
+                                tmp.put("time", courselist.get(i).getTime());
+                                tmp.put("room", courselist.get(i).getRoom());
+                                tmp.put("teacher", courselist.get(i).getTeacherName());
+                                tmp.put("object", courselist.get(i));
+                                courseItem.add(tmp);
+                            }
+                            courseListAdp.notifyDataSetChanged();
+                        }
+                    });
+                    addCourse.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {}
+                    });
+                }
+            }
+        });
     }
 
     @Override
@@ -120,8 +334,19 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("username", username);
             editor.apply();
-            //search in DB to initial classes and ddl;
             editor.commit();
+            student = sdb.queryStu(sharedPref.getString("username", "")).get(0);
+            Toast.makeText(MainActivity.this, "欢迎" + student.getSName() + "同学", Toast.LENGTH_SHORT);
+            List<CourseModel> courselist = cdb.queryCourseBySname(student.getSName());
+
+            for(int i = 0; i < courselist.size(); i++){
+                Map<String, Object> tmp = new LinkedHashMap<>();
+                tmp.put("name", courselist.get(i).getCourseName());
+                tmp.put("time", courselist.get(i).getTime());
+                tmp.put("room", courselist.get(i).getRoom());
+                courseItem.add(tmp);
+            }
+            courseListAdp.notifyDataSetChanged();
             //search in DB to initial classes and taskDDL;
         }
     }

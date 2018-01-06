@@ -41,6 +41,20 @@ public class StudentDB extends SQLiteOpenHelper {
                 + "resttime text);";
         db.execSQL(STU_TABLE);
         db.execSQL(SET_TABLE);
+        String CREATE_COURSE_TABLE1 = "create table Courses"
+                + " (courseId integer primary key autoincrement, "
+                + "courseName text , "
+                + "weekday integer , "
+                + "startTime text , "
+                + "endTime text , "
+                + "teacherName text, "
+                + "room text);";
+        String CREATE_COURSE_TABLE2 = "create table StuCourses"
+                + " (Id integer primary key autoincrement, "
+                + "sname text , "
+                + "cid integer)";
+        db.execSQL(CREATE_COURSE_TABLE1);
+        db.execSQL(CREATE_COURSE_TABLE2);
     }
 
     /* DB_VERSION 变化时调用此函数 */
