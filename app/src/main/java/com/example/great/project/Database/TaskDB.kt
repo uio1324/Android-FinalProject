@@ -46,8 +46,6 @@ class TaskDB(context: Context?) : SQLiteOpenHelper(context, context!!.getString(
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-
-    //TODO 修改成text ，删除任务的时候级联
     //插入新任务
     fun newTask(data: Task, acceptInvitation: Boolean)
     {
