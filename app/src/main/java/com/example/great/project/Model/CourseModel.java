@@ -1,4 +1,4 @@
-package com.example.great.project.Models;
+package com.example.great.project.Model;
 
 /**
  * Created by great on 2018/1/5.

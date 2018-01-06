@@ -1,0 +1,138 @@
+package com.example.great.project.Database;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import com.example.great.project.Model.StuSet;
+import com.example.great.project.Model.Student;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+/**
+ * Created by Danboard on 18-1-5.
+ */
+
+public class StudentDB extends SQLiteOpenHelper {
+    private static final String DB_NAME = "SCHOOL.db";          // 数据库名字
+    private static final String STU_TABLE_NAME = "STUDENTS";    // "学生"表名
+    private static final String SET_TABLE_NAME = "SETTINGS";    // "设置"表名
+    private static final int DB_VERSION = 1;                    // 版本号
+
+    public StudentDB(Context context) {  // 构造函数，方便创建，只传入context
+        super(context, DB_NAME, null, DB_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String STU_TABLE = "create table " + STU_TABLE_NAME
+                + "(sname text primary key, "
+                + "nickname text not null, "
+                + "password text not null);";
+        String SET_TABLE = "create table " + SET_TABLE_NAME
+                + "(sName text primary key, "
+                + "maxtask integer not null, "
+                + "studytime text, "
+                + "resttime text);";
+        db.execSQL(STU_TABLE);
+        db.execSQL(SET_TABLE);
+    }
+
+    /* DB_VERSION 变化时调用此函数 */
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("drop table if exists " + STU_TABLE_NAME);
+        db.execSQL("drop table if exists " + SET_TABLE_NAME);
+        onCreate(db);
+    }
+
+    /* 注册（添加）用户 */
+    public void insertStu(Student item) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("sname", item.getSName());
+        values.put("nickname", item.getNickName());
+        values.put("password", item.getPassword());
+
+        db.insert(STU_TABLE_NAME, null, values);
+        Log.d("TAG", "Student Insert Successfully");
+    }
+
+    /* 查询sName | 所有用户 */
+    public List<Student> queryStu(String sName) {
+        SQLiteDatabase db = getReadableDatabase();
+        String selection;
+        String[] selectionArgs;
+        if(sName == null){
+            selection = null;
+            selectionArgs = null;
+        }else {
+            selection = "sname = ? ";
+            selectionArgs = new String[]{sName};
+        }
+        Cursor c = db.query(STU_TABLE_NAME, null, selection, selectionArgs, null, null, null);
+        List<Student> list = new ArrayList<>();
+        while (c.moveToNext()) {
+            Student item = new Student();
+            item.setSName(c.getString(c.getColumnIndex("sname"))); ;
+            item.setNickName(c.getString(c.getColumnIndex("nickname")));
+            item.setPassWord(c.getString(c.getColumnIndex("password")));
+            list.add(item);
+        }
+        c.close();
+        Log.d("TAG", "Student Query Successfully");
+        return list;
+    }
+
+    /* 修改密码 | 昵称 */
+    public void updateStu(Student item) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        String whereClause = "sname = ?";
+        String[] whereArgs = {item.getSName()};
+
+        values.put("username", item.getSName());
+        values.put("nickname", item.getNickName());
+        values.put("password", item.getPassword());;
+
+        db.update(STU_TABLE_NAME, values, whereClause, whereArgs);
+        Log.d("TAG", "Student Update Successfully");
+    }
+
+    /* 返回学习设置 */
+    public StuSet QuerySetting(String sName) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.query(SET_TABLE_NAME, null, "sname = ? ", new String[]{sName}, null, null, null);
+        StuSet item = new StuSet();
+        while (c.moveToNext()) {
+            item.setMaxTask(c.getColumnIndex("maxtask")); ;
+            item.setStudyTime(c.getString(c.getColumnIndex("studytime")));
+            item.setRestTime(c.getString(c.getColumnIndex("resttime")));
+        }
+        c.close();
+        return item;
+    }
+
+    /* 修改学习设置 */
+    public void StudySetting(StuSet item) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        String whereClause = "sid = ?";
+        String[] whereArgs = {item.getSName()};
+
+        values.put("maxtask", item.getMaxTask());
+        values.put("studytime", item.getStudyTime());
+        values.put("resttime", item.getRestTime());
+
+        db.update(SET_TABLE_NAME, values, whereClause, whereArgs);
+        Log.d("TAG", "StudySet Update Successfully");
+    }
+}
