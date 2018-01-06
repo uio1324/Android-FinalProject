@@ -1,10 +1,12 @@
 package com.example.great.project.Model;
 
+import java.io.Serializable;
+
 /**
  * Created by great on 2018/1/5.
  */
 
-public class CourseModel {
+public class CourseModel implements Serializable {
     private int courseId;
     private String courseName;
     private String weekDay;

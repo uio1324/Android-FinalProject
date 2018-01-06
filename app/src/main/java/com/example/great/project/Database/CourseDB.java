@@ -37,14 +37,12 @@ public class CourseDB extends SQLiteOpenHelper {
                 "courseName = ? and weekday = ? and startTime = ? and endTime = ? and teacherName = ? and room = ?",
                 new String[]{course.getCourseName(), course.getWeekDay(), course.getStartTime(), course.getEndTime(), course.getTeacherName(), course.getRoom()},
                 null, null,null);
+        int i = cursor.getCount();
         if(cursor.getCount() <= 0) {
-            cursor.close();
-            db.close();
             return -1;
         }
         else {
-            cursor.close();
-            db.close();
+            cursor.moveToFirst();
             return cursor.getInt(cursor.getColumnIndex("courseId"));
         }
     }
@@ -169,8 +167,9 @@ public class CourseDB extends SQLiteOpenHelper {
     //用于删除课程，传入执行删除的学生名和要删除的课程id
     public void deleteCourse(String sname, int cid){
         SQLiteDatabase db = getWritableDatabase();
-        Cursor cursor = db.query(TABLE_NAME2, null, "where cid = ?",
-                new String[]{Integer.toString(cid)}, null, null, null);
+        String idStr = Integer.toString(cid);
+        Cursor cursor = db.query(TABLE_NAME2, null, "cid = ?",
+                new String[]{idStr}, null, null, null);
         if(cursor.getCount() == 1){
             String whereClause = "courseId = ?";
             String[] whereArgs = {Integer.toString(cid)};
