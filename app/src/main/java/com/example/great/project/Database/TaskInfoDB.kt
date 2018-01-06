@@ -21,13 +21,7 @@ class TaskInfoDB(c: Context) : SQLiteOpenHelper(c, c!!.getString(R.string.DB_nam
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        val CREATE_TABLE = ("create table " + TABLE_NAME
-                + "(_id integer primary key AUTOINCREMENT, "
-                + "taskId integer, "
-                + "pusherId integer, "
-                + "content text);")
-        db!!.execSQL(CREATE_TABLE)
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
