@@ -17,29 +17,16 @@ import java.util.List;
  */
 
 public class CourseDB extends SQLiteOpenHelper {
-//    private static String DB_NAME;
+    private static final String DB_NAME = "SCHOOL.db";
     private static final int DB_VERSION = 1;
     private static final String TABLE_NAME1 = "Courses";
     private static final String TABLE_NAME2 = "StuCourses";
 
     public CourseDB(Context context) {
-        super(context, context.getResources().getString(R.string.DB_name), null, DB_VERSION);
+        super(context, DB_NAME, null, DB_VERSION);
     }
 
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_TABLE1 = "create table " + TABLE_NAME1
-                + " (courseId integer primary key autoincrement, "
-                + "courseName text , "
-                + "weekday integer , "
-                + "startTime text , "
-                + "endTime text , "
-                + "teacherName text);";
-        String CREATE_TABLE2 = "create table " + TABLE_NAME2
-                + " (Id integer primary key autoincrement, "
-                + "sname text , "
-                + "cid integer)";
-        db.execSQL(CREATE_TABLE1);
-        db.execSQL(CREATE_TABLE2);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){}
@@ -47,8 +34,8 @@ public class CourseDB extends SQLiteOpenHelper {
     public int existCourse(CourseModel course){
         SQLiteDatabase db = getWritableDatabase();
         Cursor cursor = db.query(TABLE_NAME1, new String[]{"courseId"},
-                "courseName = ? and weekday = ? and startTime = ? and endTime = ? and teacherName = ?",
-                new String[]{course.getCourseName(), Integer.toString(course.getWeekDay()), course.getStartTime(), course.getEndTime(), course.getTeacherName()},
+                "courseName = ? and weekday = ? and startTime = ? and endTime = ? and teacherName = ? and room = ?",
+                new String[]{course.getCourseName(), course.getWeekDay(), course.getStartTime(), course.getEndTime(), course.getTeacherName(), course.getRoom()},
                 null, null,null);
         if(cursor.getCount() == 0) {
             cursor.close();
@@ -67,17 +54,18 @@ public class CourseDB extends SQLiteOpenHelper {
     public List<CourseModel> queryCourseBySname(String sname){
         SQLiteDatabase db = getWritableDatabase();
         List<CourseModel> queryRes = new ArrayList<>();
-        Cursor cursor = db.rawQuery("select courseId, courseName, weekday, startTime, endTime, teacherName " +
+        Cursor cursor = db.rawQuery("select courseId, courseName, weekday, startTime, endTime, teacherName, room " +
                 "from Courses, StuCourses " +
                 "where Courses.courseId = StuCourses.cid and StuCourses.sname = " + sname, null);
         while (cursor.moveToNext()){
             CourseModel tmp = new CourseModel();
             tmp.setCourseId(cursor.getInt(cursor.getColumnIndex("courseID")));
             tmp.setCourseName(cursor.getString(cursor.getColumnIndex("courseName")));
-            tmp.setWeekDay(cursor.getInt(cursor.getColumnIndex("weekday")));
+            tmp.setWeekDay(cursor.getString(cursor.getColumnIndex("weekday")));
             tmp.setStartTime(cursor.getString(cursor.getColumnIndex("startTime")));
             tmp.setEndTime(cursor.getString(cursor.getColumnIndex("endTime")));
             tmp.setTeacherName(cursor.getString(cursor.getColumnIndex("teacherName")));
+            tmp.setRoom(cursor.getString(cursor.getColumnIndex("room")));
             queryRes.add(tmp);
         }
         cursor.close();
@@ -94,10 +82,11 @@ public class CourseDB extends SQLiteOpenHelper {
             CourseModel tmp = new CourseModel();
             tmp.setCourseId(cursor.getInt(cursor.getColumnIndex("courseID")));
             tmp.setCourseName(cursor.getString(cursor.getColumnIndex("courseName")));
-            tmp.setWeekDay(cursor.getInt(cursor.getColumnIndex("weekday")));
+            tmp.setWeekDay(cursor.getString(cursor.getColumnIndex("weekday")));
             tmp.setStartTime(cursor.getString(cursor.getColumnIndex("startTime")));
             tmp.setEndTime(cursor.getString(cursor.getColumnIndex("endTime")));
             tmp.setTeacherName(cursor.getString(cursor.getColumnIndex("teacherName")));
+            tmp.setRoom(cursor.getString(cursor.getColumnIndex("room")));
             queryRes.add(tmp);
         }
         cursor.close();
@@ -143,7 +132,7 @@ public class CourseDB extends SQLiteOpenHelper {
             db.insert("Courses", null, values);
             Cursor cursor = db.query(TABLE_NAME1, null,
                             "courseName = ? and weekday = ? and startTime = ? and endTime = ? and teacherName = ?",
-                    new String[]{course.getCourseName(), Integer.toString(course.getWeekDay()), course.getStartTime(), course.getEndTime(), course.getTeacherName()},
+                    new String[]{course.getCourseName(), course.getWeekDay(), course.getStartTime(), course.getEndTime(), course.getTeacherName()},
                     null, null, null);
             int id = cursor.getInt(cursor.getColumnIndex("courseId"));
             addExistedCourse(id, sname);
