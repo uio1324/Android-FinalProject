@@ -22,7 +22,8 @@
         <activity android:name=".Activities.LessonDetail" />
         <activity android:name=".Activities.TaskDetail" />
         <activity android:name=".Activities.LessonEdit" />
-        <activity android:name=".Activities.TaskEdit"></activity>
+        <activity android:name=".Activities.TaskEdit" />
+        <activity android:name=".Activities.Settings"></activity>
     </application>
 
 </manifest>

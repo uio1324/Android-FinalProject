@@ -136,7 +136,7 @@ public class StudentDB extends SQLiteOpenHelper {
         String whereClause = "sname = ?";
         String[] whereArgs = {item.getSName()};
 
-        values.put("username", item.getSName());
+        values.put("sname", item.getSName());
         values.put("nickname", item.getNickName());
         values.put("password", item.getPassword());;
 
