@@ -9,6 +9,13 @@ public class Student {
     private String nickName;
     private String password;
 
+    public Student(){}
+    public Student(String sName, String nickName, String password) {
+        this.sName = sName;
+        this.nickName = nickName;
+        this.password = password;
+    }
+
     public void setSName(String sName) {
         this.sName = sName;
     }

@@ -10,11 +10,10 @@ import android.widget.Toast;
 
 import com.example.great.project.Database.StudentDB;
 import com.example.great.project.Model.Student;
+import com.example.great.project.R;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.example.great.project.R;
 
 public class Login extends AppCompatActivity {
 
@@ -95,10 +94,7 @@ public class Login extends AppCompatActivity {
                 } else if(!pwdStr.equals(confirmpwdStr)){
                     Toast.makeText(Login.this, "密码不匹配", Toast.LENGTH_SHORT).show();
                 } else {
-                    Student item = new Student();
-                    item.setSName(usernameStr);
-                    item.setNickName(usernameStr);
-                    item.setPassWord(pwdStr);
+                    Student item = new Student(usernameStr, usernameStr, pwdStr);
                     sdb.insertStu(item);
                     Intent intent = new Intent(Login.this, MainActivity.class);
                     intent.putExtra("username", usernameStr);
@@ -115,5 +111,10 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         initial();
         setListener();
+    }
+    @Override
+    public void onBackPressed() {
+        finish();
+        System.exit(0);
     }
 }
