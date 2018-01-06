@@ -43,5 +43,7 @@ public class TaskDetail extends AppCompatActivity {
             courseId = extras.getInt("courseId");
             stuId = extras.getInt("stuId");
         }
+
+
     }
 }
