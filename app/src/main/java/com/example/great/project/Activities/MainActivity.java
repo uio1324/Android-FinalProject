@@ -27,6 +27,11 @@ import com.example.great.project.R;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+<<<<<<< HEAD
+=======
+import java.util.Map;
+import com.example.great.project.R;
+>>>>>>> f8b3790b6f33ef826e208ca9673eeab72f8a8564
 
 //请注意控件命名规范:act名_自定义控件名
 //如在taskedit里的控件请命名为taskedit_xxxx
@@ -119,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(new Intent(MainActivity.this, Login.class), 1);
         }
         else{
-            //search in DB to initial classes and ddl;
+            //search in DB to initial classes and taskDDL;
             //Toast 欢迎您username
             stulist = sdb.queryStu(username);
             for(Student item:stulist) {
@@ -251,7 +256,12 @@ public class MainActivity extends AppCompatActivity {
             editor.putString("username", username);
             editor.apply();
             //search in DB to initial classes and ddl;
+<<<<<<< HEAD
             Log.d("TAG", "onActivityResult");
+=======
+            editor.commit();
+            //search in DB to initial classes and taskDDL;
+>>>>>>> f8b3790b6f33ef826e208ca9673eeab72f8a8564
         }
 
     }
