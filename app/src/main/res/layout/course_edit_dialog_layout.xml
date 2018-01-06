@@ -18,9 +18,9 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1.5"
             android:gravity="center"
-            android:text="课程名称:"
+            android:text="名称:"
             android:textSize="18sp" />
 
         <EditText
@@ -43,9 +43,9 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1.5"
             android:gravity="center"
-            android:text="课程地点:"
+            android:text="地点:"
             android:textSize="18sp" />
 
         <EditText
@@ -68,9 +68,9 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1.5"
             android:gravity="center"
-            android:text="课程时间:"
+            android:text="时间:"
             android:textSize="18sp" />
 
         <EditText
@@ -141,9 +141,9 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1.5"
             android:gravity="center"
-            android:text="教师名称:"
+            android:text="教师:"
             android:textSize="18sp" />
 
         <EditText
@@ -166,9 +166,9 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1.5"
             android:gravity="center"
-            android:text="课程日期:"
+            android:text="日期:"
             android:textSize="18sp" />
         <Spinner
             android:layout_width="0dp"
