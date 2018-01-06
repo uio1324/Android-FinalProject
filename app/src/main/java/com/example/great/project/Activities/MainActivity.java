@@ -71,10 +71,10 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_classes:
-                    //隐藏其余三个选项卡的控件
+                    //setContentView(R.layout.activity_main);
                     return true;
                 case R.id.navigation_ddl:
-
+                    //setContentView(R.layout.activity_calendar);
                     return true;
                 case R.id.navigation_learn:
 
@@ -168,8 +168,8 @@ public class MainActivity extends AppCompatActivity {
         this.courseExisted.setLayoutManager(new LinearLayoutManager(this));
         ScaleInAnimationAdapter animationAdapter1 = new ScaleInAnimationAdapter(courseListAdp);
         ScaleInAnimationAdapter animationAdapter2 = new ScaleInAnimationAdapter(courseExistedAdp);
-        animationAdapter1.setDuration(1000);
-        animationAdapter2.setDuration(1000);
+        animationAdapter1.setDuration(300);
+        animationAdapter2.setDuration(300);
         courseRecy.setAdapter(animationAdapter1);
         courseExisted.setAdapter(animationAdapter2);
         courseRecy.setItemAnimator(new OvershootInLeftAnimator());
@@ -200,33 +200,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void setListener(){
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        /*this.goodsAdp.setOnItemClickListener(new CommonAdapter.OnItemClickListener() {
-            @Override
-            public void onClick(int position) {
-                Intent intent = new Intent(MainActivity.this, DatailPage.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("goods", (Serializable)MainActivity.this.data.get(position));
-                intent.putExtras(bundle);
-                MainActivity.this.startActivityForResult(intent, 1);
-            }
-
-            @Override
-            public void onLongClick(int position) {
-                MainActivity.this.goodsAdp.removeItem(position);
-                data.remove(position);
-                Toast.makeText(MainActivity.this, "移除第" + position+ "个商品", Toast.LENGTH_LONG).show();
-            }
-        });*/
         courseListAdp.setOnItemClickListener(new CommonAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
-
+                Intent intent = new Intent(MainActivity.this, LessonDetail.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("course", (Serializable) courseItem.get(position).get("object"));
+                bundle.putString("sname", student.getSName());
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 2);
             }
 
             @Override
-            public void onLongClick(int position) {
-
-            }
+            public void onLongClick(int position) {}
         });
         courseExistedAdp.setOnItemClickListener(new CommonAdapter.OnItemClickListener() {
             @Override
@@ -377,18 +363,21 @@ public class MainActivity extends AppCompatActivity {
             editor.commit();
             student = sdb.queryStu(sharedPref.getString("username", "")).get(0);
             Toast.makeText(MainActivity.this, "欢迎" + student.getSName() + "同学", Toast.LENGTH_SHORT);
-            List<CourseModel> courselist = cdb.queryCourseBySname(student.getSName());
 
-            for(int i = 0; i < courselist.size(); i++){
-                Map<String, Object> tmp = new LinkedHashMap<>();
-                tmp.put("name", courselist.get(i).getCourseName());
-                tmp.put("time", courselist.get(i).getTime());
-                tmp.put("room", courselist.get(i).getRoom());
-                courseItem.add(tmp);
-            }
-            courseListAdp.notifyDataSetChanged();
             //search in DB to initial classes and taskDDL;
         }
+        courseItem.clear();
+        List<CourseModel> courselist = cdb.queryCourseBySname(student.getSName());
+        for(int i = 0; i < courselist.size(); i++){
+            Map<String, Object> tmp = new LinkedHashMap<>();
+            tmp.put("name", courselist.get(i).getCourseName());
+            tmp.put("time", courselist.get(i).getTime());
+            tmp.put("room", courselist.get(i).getRoom());
+            tmp.put("teacher", courselist.get(i).getTeacherName());
+            tmp.put("object", courselist.get(i));
+            courseItem.add(tmp);
+        }
+        courseListAdp.notifyDataSetChanged();
     }
 
     // 移除bottombutton动画
