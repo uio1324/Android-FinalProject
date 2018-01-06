@@ -7,12 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.example.great.project.Model.StuSet;
 import com.example.great.project.Model.Student;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -25,8 +24,6 @@ public class StudentDB extends SQLiteOpenHelper {
     private static final String SET_TABLE_NAME = "SETTINGS";    // "设置"表名
     private static final int DB_VERSION = 1;                    // 版本号
 
-
-
     public StudentDB(Context context) {  // 构造函数，方便创建，只传入context
         super(context, DB_NAME, null, DB_VERSION);
     }
@@ -35,14 +32,14 @@ public class StudentDB extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String STU_TABLE = "create table " + STU_TABLE_NAME
                 + "(sname text primary key, "
-                + "nickname text not null "
+                + "nickname text not null, "
                 + "password text not null);";
-        db.execSQL(STU_TABLE);
         String SET_TABLE = "create table " + SET_TABLE_NAME
                 + "(sName text primary key, "
                 + "maxtask integer not null, "
                 + "studytime text, "
                 + "resttime text);";
+        db.execSQL(STU_TABLE);
         db.execSQL(SET_TABLE);
     }
 
@@ -68,7 +65,7 @@ public class StudentDB extends SQLiteOpenHelper {
     }
 
     /* 查询sName | 所有用户 */
-    public List<Map<String, Object>> queryStu(String sName) {
+    public List<Student> queryStu(String sName) {
         SQLiteDatabase db = getReadableDatabase();
         String selection;
         String[] selectionArgs;
@@ -80,13 +77,13 @@ public class StudentDB extends SQLiteOpenHelper {
             selectionArgs = new String[]{sName};
         }
         Cursor c = db.query(STU_TABLE_NAME, null, selection, selectionArgs, null, null, null);
-        List<Map<String, Object>> list = new ArrayList<>();
+        List<Student> list = new ArrayList<>();
         while (c.moveToNext()) {
-            Map<String, Object> temp = new LinkedHashMap<>();
-            temp.put("sname", c.getString(c.getColumnIndex("sname")));
-            temp.put("nickname", c.getString(c.getColumnIndex("nickname")));
-            temp.put("password", c.getString(c.getColumnIndex("password")));
-            list.add(temp);
+            Student item = new Student();
+            item.setSName(c.getString(c.getColumnIndex("sname"))); ;
+            item.setNickName(c.getString(c.getColumnIndex("nickname")));
+            item.setPassWord(c.getString(c.getColumnIndex("password")));
+            list.add(item);
         }
         c.close();
         Log.d("TAG", "Student Query Successfully");
@@ -109,8 +106,22 @@ public class StudentDB extends SQLiteOpenHelper {
         Log.d("TAG", "Student Update Successfully");
     }
 
-    /* 学习设置 */
-    public void StudySetting(Student item) {
+    /* 返回学习设置 */
+    public StuSet QuerySetting(String sName) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.query(SET_TABLE_NAME, null, "sname = ? ", new String[]{sName}, null, null, null);
+        StuSet item = new StuSet();
+        while (c.moveToNext()) {
+            item.setMaxTask(c.getColumnIndex("maxtask")); ;
+            item.setStudyTime(c.getString(c.getColumnIndex("studytime")));
+            item.setRestTime(c.getString(c.getColumnIndex("resttime")));
+        }
+        c.close();
+        return item;
+    }
+
+    /* 修改学习设置 */
+    public void StudySetting(StuSet item) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
 
@@ -122,6 +133,6 @@ public class StudentDB extends SQLiteOpenHelper {
         values.put("resttime", item.getRestTime());
 
         db.update(SET_TABLE_NAME, values, whereClause, whereArgs);
-        Log.d("TAG", "StuTask Update Successfully");
+        Log.d("TAG", "StudySet Update Successfully");
     }
 }

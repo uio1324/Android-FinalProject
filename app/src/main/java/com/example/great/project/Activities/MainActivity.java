@@ -1,20 +1,32 @@
 package com.example.great.project.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.internal.BottomNavigationItemView;
+import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.example.great.project.Database.StudentDB;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import com.example.great.project.R;
 
 public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPref;
     private BottomNavigationView navigation;
+    private StudentDB sdb = new StudentDB(this);
+    List<Map<String, Object>> stulist = new ArrayList<>();
+
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -77,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initial(){
         navigation = findViewById(R.id.navigation);
+        disableShiftMode(navigation);
+
         sharedPref = MainActivity.this.getSharedPreferences("username", Context.MODE_PRIVATE);
         String username = sharedPref.getString("username","");
         if(username.isEmpty()){
@@ -105,9 +119,29 @@ public class MainActivity extends AppCompatActivity {
             String username = data.getStringExtra("username");
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("username", username);
+            editor.apply();
+            //search in DB to initial classes and ddl;
             editor.commit();
             //search in DB to initial classes and taskDDL;
         }
     }
 
+    // 移除bottombutton动画
+    @SuppressLint("RestrictedApi")
+    public static void disableShiftMode(BottomNavigationView view) {
+        BottomNavigationMenuView menuView = (BottomNavigationMenuView) view.getChildAt(0);
+        try {
+            Field shiftingMode = menuView.getClass().getDeclaredField("mShiftingMode");
+            shiftingMode.setAccessible(true);
+            shiftingMode.setBoolean(menuView, false);
+            shiftingMode.setAccessible(false);
+            for (int i = 0; i < menuView.getChildCount(); i++) {
+                BottomNavigationItemView item = (BottomNavigationItemView) menuView.getChildAt(i);
+                item.setShiftingMode(false);
+                item.setChecked(item.getItemData().isChecked());
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
 }
