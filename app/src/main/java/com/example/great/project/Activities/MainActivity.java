@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +37,8 @@ import java.util.Map;
 import com.example.great.project.Model.CourseModel;
 import com.example.great.project.Model.Student;
 import com.example.great.project.R;
+
+import org.w3c.dom.Text;
 
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator;
@@ -57,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView courseHint;
     private RecyclerView courseExisted;
     private AlertDialog.Builder addCourse;
+    private ImageView backCourse;
+    private TextView courseTopHint;
     int addBtnFlag;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -129,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
         courseHint = findViewById(R.id.course_hint);
         courseExisted = findViewById(R.id.course_existed);
         courseExisted.setVisibility(View.INVISIBLE);
+        backCourse = findViewById(R.id.course_back);
+        backCourse.setVisibility(View.INVISIBLE);
+        courseTopHint = findViewById(R.id.course_title);
         this.courseListAdp = new CommonAdapter<Map<String, Object>>(this, R.layout.lesson_recy_layout, this.courseItem) {
             @Override
             public void convert(ViewHolder viewHolder, Map<String, Object> s) {
@@ -227,8 +235,10 @@ public class MainActivity extends AppCompatActivity {
                 addBtnFlag = 0;
                 cdb.addExistedCourse(course.getCourseId(), student.getSName());
                 courseHint.setText("添加课程");
+                courseTopHint.setText("我的课程");
                 courseRecy.setVisibility(View.VISIBLE);
                 courseExisted.setVisibility(View.INVISIBLE);
+                backCourse.setVisibility(View.INVISIBLE);
                 List<CourseModel> courselist = cdb.queryCourseBySname(student.getSName());
                 courseItem.clear();
                 for(int i = 0; i < courselist.size(); i++){
@@ -253,6 +263,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(addBtnFlag == 0){
                     courseHint.setText("自定课程");
+                    courseTopHint.setText("全部课程列表");
+                    backCourse.setVisibility(View.VISIBLE);
                     courseRecy.setVisibility(View.INVISIBLE);
                     courseExisted.setVisibility(View.VISIBLE);
                     courseItem.clear();
@@ -266,8 +278,10 @@ public class MainActivity extends AppCompatActivity {
                         tmp.put("object", courselist.get(i));
                         courseItem.add(tmp);
                     }
-                    courseListAdp.notifyDataSetChanged();
+                    courseExistedAdp.notifyDataSetChanged();
                     addBtnFlag = 1;
+                    backCourse.setVisibility(View.VISIBLE);
+
                 }
                 else{
                     addCourse.setTitle("添加自定义课程");
@@ -292,9 +306,11 @@ public class MainActivity extends AppCompatActivity {
                             course.setEndTime(editCourseEndHour.getText().toString() + ":" + editCourseEndMinute.getText().toString());
                             course.setWeekDay(editCourseweekday.getSelectedItem().toString());
                             course.setTeacherName(editCourseTeacher.getText().toString());
-                            cdb.addNewCourse(student.getSName(), course);
+                            if (!editCourseName.getText().toString().isEmpty()) cdb.addNewCourse(student.getSName(), course);
                             addBtnFlag = 0;
                             courseHint.setText("添加课程");
+                            courseTopHint.setText("我的课程");
+                            backCourse.setVisibility(View.INVISIBLE);
                             courseRecy.setVisibility(View.VISIBLE);
                             courseExisted.setVisibility(View.INVISIBLE);
                             List<CourseModel> courselist = cdb.queryCourseBySname(student.getSName());
@@ -315,7 +331,31 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {}
                     });
+                    addCourse.show();
                 }
+            }
+        });
+        backCourse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addBtnFlag = 0;
+                courseHint.setText("添加课程");
+                courseTopHint.setText("我的课程");
+                backCourse.setVisibility(View.INVISIBLE);
+                courseRecy.setVisibility(View.VISIBLE);
+                courseExisted.setVisibility(View.INVISIBLE);
+                List<CourseModel> courselist = cdb.queryCourseBySname(student.getSName());
+                courseItem.clear();
+                for(int i = 0; i < courselist.size(); i++){
+                    Map<String, Object> tmp = new LinkedHashMap<>();
+                    tmp.put("name", courselist.get(i).getCourseName());
+                    tmp.put("time", courselist.get(i).getTime());
+                    tmp.put("room", courselist.get(i).getRoom());
+                    tmp.put("teacher", courselist.get(i).getTeacherName());
+                    tmp.put("object", courselist.get(i));
+                    courseItem.add(tmp);
+                }
+                courseListAdp.notifyDataSetChanged();
             }
         });
     }
